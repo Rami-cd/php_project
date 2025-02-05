@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\test_controller_1;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,5 +17,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::get('/testing_1', [test_controller_1::class, 'edit'])->name('edit');
 
 require __DIR__.'/auth.php';
