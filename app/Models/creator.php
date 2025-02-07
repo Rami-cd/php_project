@@ -1,10 +1,14 @@
 <?php
 
 namespace App\Models;
-
+ 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class creator extends Model
+class Creator extends Model
 {
+    protected $table = "creators";
+
+    use HasFactory;
     protected $fillable = [];
 }
