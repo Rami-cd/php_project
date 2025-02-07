@@ -21,11 +21,11 @@ class RoleAndPermissionSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'approve courses']);
         Permission::firstOrCreate(['name'=> 'create courses']);
         Permission::firstOrCreate(['name'=> 'delete courses']);
-
+ 
         // Create roles if they don't exist
         $admin = Role::firstOrCreate(['name' => 'admin']);
         $teacher = Role::firstOrCreate(['name' => 'teacher']);
-        $student = Role::firstOrCreate(['name' => 'student']);
+        $student = Role::firstOrCreate(['name' => 'student']); 
 
         // Assign permissions to roles
         $admin->givePermissionTo([

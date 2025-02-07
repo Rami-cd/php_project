@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\Course;
 
 class User extends Authenticatable /*implements MustVerifyEmail*/
 {
@@ -46,5 +47,22 @@ class User extends Authenticatable /*implements MustVerifyEmail*/
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'creators', 'user_id', 'course_id')
+                    ->withTimestamps();
+    }
+    
+
+    // on creation of user, it get the student role by default
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            $user->assignRole('student');
+        });
     }
 }

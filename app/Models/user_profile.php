@@ -3,11 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\app_user;
 
-class user_profile extends Model
+class User_profile extends Model
 {
-
+    protected $table = "user_profiles";
     protected $fillables = ["first_name", "last_name", "headline", 
                             "language", "portfolio_url","linkedin_url",
                             "twitter_url","facebook_url","youtube_url",

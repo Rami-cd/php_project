@@ -4,7 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class enrollment extends Model
+class Enrollment extends Model
 {
+    protected $table = "enrollments";
     protected $fillable = ["pourcentage", "completed_at"];
 }
