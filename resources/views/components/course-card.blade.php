@@ -29,7 +29,7 @@
         @endcan
 
         <a href="{{ route('show_course_info', $course->id) }}" class="btn btn-primary">
-            Go to Course Info
+            Go to Course Info 
         </a>
     </div>
 

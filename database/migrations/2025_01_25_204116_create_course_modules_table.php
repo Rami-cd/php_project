@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('course_id')->constrained('courses')->onDelete('cascade');
             $table->string('name');
             $table->tinyText('description');
-            $table->integer('pourcentage');
             $table->integer('order');
+            $table->string('course_url');
             $table->timestamps();
         });
     }
