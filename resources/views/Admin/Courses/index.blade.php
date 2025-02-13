@@ -30,14 +30,18 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody> 
                 @foreach($courses as $course)
                     <tr>
-                        <td>{{ $course->title }}</td>
-                        <td>{{ $course->status }}</td>
+                        <td>{{ $course->name }}</td>
+                        <td></td>
                         <td>
-                            <a href="{{ route('edit_course', $course->id) }}" class="btn btn-warning">Edit</a>
-                            <form action="{{ route('delete_course', $course->id) }}" method="POST" style="display:inline;">
+                            <form action="{{ route('edit_course', ['id' => $course->id]) }}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <button type="submit">Edit Course</button>
+                            </form>
+                            <form action="{{ route('admin.courses.delete', $course->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">Delete</button>
