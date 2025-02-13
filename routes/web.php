@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CourseModuleController;
 use App\Models\User;
 use App\Models\course;
 use App\Http\Controllers\ProfileController;
@@ -12,8 +13,10 @@ use Illuminate\Http\Request;
 use Illuminate\Auth\Access\AuthorizationException;
 
 Route::get('/', function () {
-    $courses = Course::all();  // Retrieve all courses
-    return view('Courses.index', compact('courses'));
+    // $courses = Course::all();  // Retrieve all courses
+    // return view('Courses.index', compact('courses'));
+    // return view('testview');
+    return view('courses.createcourse');
 });
 
 Route::get('/dashboard', function () {
@@ -41,25 +44,19 @@ Route::post('/submit-form', function (Request $request) {
 
 
 
-// Route::post('/submit-form', function (Request $request) {
-//     $course = course::find($request->input('course'));
-//     if(Gate::denies('edit-course', $course)) {
-//         abort(403, 'You are not the creator of this course.');
-//     } else {
-//         return response()->json(["message", "wow"], 200);
-//     }
-// });
-
+// courses routes
 // no guard anyone can see the courses
-Route::get("/courses", [CourseController::class, 'get_all_courses'])->name('get_all_courses');
-Route::get("/courses/{id}", [CourseController::class, 'get_course_by_id'])->name('get_course_by_id');
+Route::get("/courses", [CourseController::class, 'get_all_courses'])
+    ->name('get_all_courses');
 
+Route::get("/courses/{id}", [CourseController::class, 'get_course_by_id'])
+    ->name('get_course_by_id');
 
 Route::post('/courses/create-course', [CourseController::class, 'create_course'])
     ->name('create_course')
     ->middleware(['auth', 'permission:create courses']);
 
-Route::put('/courses/{id}', [CourseController::class,'edit_course'])
+Route::put('/courses/{id}', [CourseController::class, 'edit_course'])
     ->name('edit_course')
     ->middleware(['auth', 'permission:manage courses']);
 
@@ -67,19 +64,42 @@ Route::delete('/courses/{id}', [CourseController::class, 'delete_course'])
     ->name('delete_course')
     ->middleware(['auth', 'permission:delete courses']);
 
-Route::get('/courses/info/{id}', [CourseController::class,'show_course_info'])
+Route::get('/courses/info/{id}', [CourseController::class, 'show_course_info'])
     ->name('show_course_info');
+
+Route::post('/courses/create_module', [CourseModuleController::class, 'create_module'])
+    ->name('create_module');
+
+Route::get('/courses/module_form/{course}', [CourseModuleController::class, 'module_form'])
+    ->name('module_creation_form');
+// courses routes
+
+
+// modules routes
+Route::get('/module/{module}/edit', [CourseModuleController::class, 'edit'])->name('module.edit');
+Route::put('/module/{module}', [CourseModuleController::class, 'update'])->name('module.update');
+// modules routes
+
 
 // testing routes
 Route::post('/testing_1', function(Request $request) {
     return view('testform2', ['id'=> $request->input('id')]);
 })->middleware(['auth', 'permission:manage courses']);
+// testing routes
+
 
 
 // admin routes
-Route::middleware(['role:admin'])->group(function () {
-    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+// Admin routes
+Route::prefix('admin')->middleware(['role:admin'])->group(function() {
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    
+    // Users management
+    Route::get('/users', [AdminController::class, 'listUsers'])->name('admin.users.index');
+    
+    // Courses management
+    Route::get('/courses', [AdminController::class, 'listCourses'])->name('admin.courses.index');
 });
-
+// admin routes
 
 require __DIR__.'/auth.php';

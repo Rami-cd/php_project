@@ -22,8 +22,8 @@ class Course_moduleFactory extends Factory
         return [
             'name' => $this->faker->word,  // Generates a random word for the module name
             'description' => $this->faker->sentence,  // Generates a random sentence for the description
-            'pourcentage' => $this->faker->numberBetween(1, 100),  // Generates a random percentage between 1 and 100
             'order' => $this->faker->numberBetween(1, 10),  // Generates a random order between 1 and 10
+            'course_url' => $this->faker->url,
             'course_id' => Course::factory(),  // Creates a new course using the Course factory
         ];
     }
