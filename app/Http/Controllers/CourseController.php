@@ -60,7 +60,7 @@ class CourseController extends Controller
             $course = Course::findOrFail(intval($id));
             
             // Check if the user has permission to edit the course
-            if (Gate::allows('edit-course', [$course])) {
+            if (Gate::allows('manage courses', [$course])) {
                 
                 // Fetch all modules associated with the course
                 $modules = $course->modules; // Assuming Course hasMany CourseModules relationship
@@ -83,7 +83,7 @@ class CourseController extends Controller
             $course = Course::findOrFail(intval($id));
             
             // Check if the user has permission to delete the course
-            if (Gate::allows('edit-course', [$course])) { 
+            if (Gate::allows('manage courses', [$course])) { 
                 // Proceed to delete the course
                 $course->delete();
                 

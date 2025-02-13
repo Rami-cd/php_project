@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Course_module;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class CourseModuleController extends Controller
 {
@@ -57,7 +58,11 @@ class CourseModuleController extends Controller
                 'description' => $request->input('description'),
                 /*'course_url' => $filePath,*/
             ]);
-            return redirect()->route('edit_course', $module->course_id)->with('success', 'Module updated successfully');
+            if(Auth::user()->hasRole('admin')) {
+                return redirect()->route('admin.courses.index', $module->course_id)->with('success', 'Module updated successfully');
+            } else {
+                return redirect()->route('edit_course', $module->course_id)->with('success', 'Module updated successfully');
+            }
         } catch (\Exception $e) {
             // Catch any exceptions and return a detailed error response
             throw $e;

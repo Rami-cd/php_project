@@ -6,7 +6,7 @@ use App\Http\Controllers\CourseModuleController;
 use App\Models\User;
 use App\Models\course;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\test_controller_1;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
@@ -81,6 +81,10 @@ Route::put('/module/{module}', [CourseModuleController::class, 'update'])->name(
 // modules routes
 
 
+// User routes
+// User routes
+
+
 // testing routes
 Route::post('/testing_1', function(Request $request) {
     return view('testform2', ['id'=> $request->input('id')]);
@@ -88,18 +92,25 @@ Route::post('/testing_1', function(Request $request) {
 // testing routes
 
 
-
-// admin routes
 // Admin routes
 Route::prefix('admin')->middleware(['role:admin'])->group(function() {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
-    
     // Users management
     Route::get('/users', [AdminController::class, 'listUsers'])->name('admin.users.index');
-    
     // Courses management
     Route::get('/courses', [AdminController::class, 'listCourses'])->name('admin.courses.index');
+
+    Route::get('/users/{user}/permissions', [AdminController::class, 'editPermissions'])->name('admin.users.permissions');
+
+    Route::post('/users/{user}/permissions', [AdminController::class, 'updatePermissions'])->name('admin.users.permissions.update');
+
+    Route::get('/admin/users/{user}/roles', [AdminController::class, 'editRoles'])->name('admin.users.roles');
+
+    Route::post('/admin/users/{user}/roles', [AdminController::class, 'updateRoles'])->name('admin.users.roles.update');
+
+    Route::delete('/courses/{id}/delete', [AdminController::class, 'deleteCourse'])->name('admin.courses.delete');
 });
 // admin routes
+
 
 require __DIR__.'/auth.php';
