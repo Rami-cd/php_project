@@ -34,7 +34,7 @@ class RoleAndPermissionSeeder extends Seeder
         ]);
 
         $teacher->givePermissionTo([
-            'manage courses', 'view courses', 'enroll courses'
+            'manage courses', 'view courses', 'enroll courses', 'create courses'
         ]);
 
         $student->givePermissionTo([

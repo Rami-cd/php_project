@@ -53,18 +53,23 @@ class AdminController extends Controller
         $query = Course::query();
 
         // Filter by course status
-        if ($request->has('status')) {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
         // Search by course title
-        if ($request->has('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
+        if ($request->filled('search')) {
+            $searchTerm = trim($request->search);
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                ->orWhere('description', 'like', '%' . $searchTerm . '%'); // Example: search in description too
+            });
         }
 
-        $courses = $query->paginate(10);  // Pagination
+        $courses = $query->paginate(10);
         return view('admin.courses.index', compact('courses'));
     }
+
 
     public function editPermissions(User $user)
     {
