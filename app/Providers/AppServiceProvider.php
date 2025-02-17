@@ -28,6 +28,14 @@ class AppServiceProvider extends ServiceProvider
             // Example: You can check if the user has permission related to the course
             // dd($user->id, $course->id);  // You can debug and see the values
             return $course->users()->where('user_id', $user->id)->exists();
-        });        
+        });
+
+        Gate::define('enrolled-in-course', function (User $user, Course $course) {
+            return $user->enrolled_courses->contains($course);
+        });
+
+        Gate::define('is-teacher', function (User $user) {
+            return $user->hasRole('teacher');
+        });
     }
 }

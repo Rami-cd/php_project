@@ -55,7 +55,17 @@ class User extends Authenticatable /*implements MustVerifyEmail*/
         return $this->belongsToMany(Course::class, 'creators', 'user_id', 'course_id')
                     ->withTimestamps();
     }
-    
+
+    public function enrolled_courses()
+    {
+        return $this->belongsToMany(Course::class, 'enrollments');
+    }
+
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
 
     // on creation of user, it get the student role by default
     protected static function boot()

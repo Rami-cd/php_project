@@ -81,7 +81,7 @@ class CourseController extends Controller
         try {
             // Find the course by ID, or fail if not found
             $course = Course::findOrFail(intval($id));
-            
+
             // Check if the user has permission to delete the course
             if (Gate::allows('manage courses', [$course])) { 
                 // Proceed to delete the course
@@ -108,7 +108,9 @@ class CourseController extends Controller
         $modules = $course->modules;
         // dd($modules);
 
-        return view('courses.courseinfo', compact('course', 'modules'));
+        if (Auth::user()->courses->contains($course)) {
+            return view('courses.courseinfo', compact('course', 'modules'));
+        }
     }
 
     public function add_modules($id) {

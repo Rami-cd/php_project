@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('course_id')->constrained('courses')->onDelete('cascade');
-            $table->integer('pourcentage')->unsigned()->nullable();
-            $table->date('completed_at');
+            $table->integer('pourcentage')->unsigned()->default(0);
+            $table->timestamp('completed_at')->nullable();
             $table->timestamps();
         });
     }

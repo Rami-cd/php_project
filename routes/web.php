@@ -3,10 +3,12 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseModuleController;
-use App\Models\User;
+use App\Http\Controllers\EnrollmentController;
+use App\Models\Categories;
 use App\Models\course;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
@@ -16,7 +18,11 @@ Route::get('/', function () {
     // $courses = Course::all();  // Retrieve all courses
     // return view('Courses.index', compact('courses'));
     // return view('testview');
-    return view('courses.createcourse');
+    // return view('courses.createcourse');
+
+    $courses = Course::has('modules')->paginate(8);
+    $categories = Categories::all();
+    return view('home', compact('categories', 'courses'));
 });
 
 Route::get('/dashboard', function () {
@@ -72,6 +78,12 @@ Route::post('/courses/create_module', [CourseModuleController::class, 'create_mo
 
 Route::get('/courses/module_form/{course}', [CourseModuleController::class, 'module_form'])
     ->name('module_creation_form');
+
+Route::get('/courses/search', [CourseController::class, 'search'])
+    ->name('courses.search');
+
+    // Route::get('/courses/{courseId}', [CourseController::class, 'show'])->name('courses.show');
+    // Route::get('/courses/{courseId}/module/{moduleId}', [CourseController::class, 'module'])->name('courses.module');
 // courses routes
 
 
@@ -82,7 +94,19 @@ Route::put('/module/{module}', [CourseModuleController::class, 'update'])->name(
 
 
 // User routes
+Route::post('/enroll/{course}', [EnrollmentController::class, 'enroll'])
+    ->middleware(['auth', 'permission:manage courses'])
+    ->name('courses.enroll');
+Route::post('/unenroll/{courseId}', [EnrollmentController::class, 'unenroll'])
+    ->middleware(['auth', 'permission:manage courses'])
+    ->name('courses.unenroll');
 // User routes
+
+
+// Home Controller
+Route::get('/search', [HomeController::class, 'search'])
+    ->name('home.search');
+// Home Controller
 
 
 // testing routes
@@ -110,7 +134,7 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function() {
 
     Route::delete('/courses/{id}/delete', [AdminController::class, 'deleteCourse'])->name('admin.courses.delete');
 });
-// admin routes
+// Admin routes
 
 
 require __DIR__.'/auth.php';
