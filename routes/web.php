@@ -15,19 +15,46 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Access\AuthorizationException;
 
+Route::get('/courses/create-course-form', [CourseController::class, 'course_form'])
+->name('course_creation_form')
+->middleware(['auth', 'permission:create courses']);
+
 Route::get('/', function () {
     // $courses = Course::all();  // Retrieve all courses
     // return view('Courses.index', compact('courses'));
     // return view('testview');
     // return view('courses.createcourse');
 
+    $warningMessage = null;
+
     $courses = Course::has('modules')->paginate(8);
     $categories = Categories::all();
-    return view('home', compact('categories', 'courses'));
-});
+
+    if (auth()->check()) {
+        if(auth()->user()->courses) {
+        foreach(auth()->user()->courses as $course) {
+            if($course->modules->isEmpty()) {
+                $warningMessage = "you have a course has no modules and will be deleted after 15 days";
+            }
+        }
+    }
+}
+
+    return view('home', compact('categories', 'courses', 'warningMessage'));
+})->name("home");
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $courses = Course::paginate(10);
+
+    // Check roles and return the appropriate view
+    if (auth()->user() && auth()->user()->hasRole('admin')) {
+        return redirect()->route('admin.dashboard');
+    } elseif (auth()->user()->hasRole('teacher')) {
+        // Directly return the teacher's dashboard with the paginated courses
+        return view('teacher.dashboard', compact('courses')); // Use view() instead of redirect()
+    } else {
+        return view('dashboard');
+    }
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -63,8 +90,7 @@ Route::post('/courses/create-course', [CourseController::class, 'create_course']
     ->name('create_course')
     ->middleware(['auth', 'permission:create courses']);
 
-Route::get('/courses/create_course', [CourseController::class, 'course_form'])
-->name('course_creation_form');
+
 
 Route::put('/courses/{id}', [CourseController::class, 'edit_course'])
     ->name('edit_course')
@@ -72,7 +98,7 @@ Route::put('/courses/{id}', [CourseController::class, 'edit_course'])
 
 Route::delete('/courses/{id}', [CourseController::class, 'delete_course'])
     ->name('delete_course')
-    ->middleware(['auth', 'permission:delete courses']);
+    ->middleware(['auth', 'permission:manage courses']);
 
 Route::get('/courses/info/{id}', [CourseController::class, 'show_course_info'])
     ->name('show_course_info');
@@ -154,5 +180,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/reject-teacher/{id}', [AdminController::class, 'rejectTeacher'])->name('admin.reject.teacher');
 });
 
+Route::middleware(['auth', 'role:teacher'])->group(function () {
+    Route::get('/teacher/dashboard', [CourseController::class, 'teacherDashboard'])
+        ->name('teacher.dashboard');
+});
 
 require __DIR__.'/auth.php';

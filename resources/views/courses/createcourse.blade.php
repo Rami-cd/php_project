@@ -59,5 +59,11 @@
             container.appendChild(newInput);
         });
     </script>
+    <script>
+    // After the form is submitted and the page is redirected, replace the current history state
+    if (window.history.replaceState) {
+        window.history.replaceState(null, document.title, window.location.href);
+    }
+</script>
 </body>
 </html>
