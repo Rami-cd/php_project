@@ -19,5 +19,7 @@
             </div>
         </div>
     </div>
+
+    @include('admin.teacher_request', ["requests" => $requests]);
 </body>
 </html>

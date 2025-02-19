@@ -58,28 +58,51 @@
 
         <!-- Action Buttons -->
         <div class="flex space-x-4">
-            <a href="{{ route('register') }}">
-                <button class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-br from-cyan-500 to-blue-500 rounded-md hover:bg-transparent hover:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200">
-                    Sign Up
-                </button>
-            </a>
+            @guest
+                <a href="{{ route('register') }}">
+                    <button class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-br from-cyan-500 to-blue-500 rounded-md hover:bg-transparent hover:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200">
+                        Sign Up
+                    </button>
+                </a>
 
-            <a href="{{ route('login') }}">
-                <button class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-br from-cyan-500 to-blue-500 rounded-md hover:bg-transparent hover:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200">
-                    Login
-                </button>
-            </a>
+                <a href="{{ route('login') }}">
+                    <button class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-br from-cyan-500 to-blue-500 rounded-md hover:bg-transparent hover:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200">
+                        Login
+                    </button>
+                </a>
+            @else
+                <!-- Teacher Request Button -->
+                @php
+                    $userRequest = Auth::user()->teacherRequest;
+                @endphp
 
-            @cannot('is-teacher')
-                <button class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-                    Teach on The Platform
-                </button>
-            @endcan
-            @can('is-teacher')
-                <button class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-                    Create Course
-                </button>
-            @endcan
+                @cannot('is-teacher')
+                    @if($userRequest && $userRequest->status === 'pending')
+                        <button class="bg-gray-300 text-gray-600 font-semibold py-2 px-4 border border-gray-400 rounded cursor-not-allowed" disabled>
+                            Awaiting Approval
+                        </button>
+                    @else
+                        <a href="{{ route('become.teacher.form') }}">
+                            <button class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                                Teach on The Platform
+                            </button>
+                        </a>
+                    @endif
+                @endcan
+
+                @can('is-teacher')
+                    <button class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                        Create Course
+                    </button>
+                @endcan
+
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-br from-cyan-500 to-blue-500 rounded-md hover:bg-transparent hover:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200">
+                        Logout
+                    </button>
+                </form>
+            @endguest
         </div>
     </div>
 </header>

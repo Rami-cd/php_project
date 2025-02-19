@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Course;
+use App\Models\TeacherRequest;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -14,7 +15,8 @@ class AdminController extends Controller
     // Admin Dashboard
     public function index()
     {
-        return view('admin.dashboard');
+        $requests = TeacherRequest::with('user')->get();
+        return view('admin.dashboard', compact('requests'));
     }
 
     // List Users with search and filter
@@ -154,5 +156,30 @@ class AdminController extends Controller
             // Catch any exceptions and return a detailed error response
             throw $e;
         }
+    }
+
+    public function viewRequests()
+    {
+        $requests = TeacherRequest::where('status', 'pending')->get();
+        return view('admin.teacher_requests', compact('requests'));
+    }
+
+    public function approveTeacher($id)
+    {
+        $request = TeacherRequest::findOrFail($id);
+        $user = User::findOrFail($request->user_id);
+
+        $user->syncRoles('teacher'); // Assign teacher role
+        $request->update(['status' => 'approved']);
+
+        return redirect()->back()->with('success', 'User approved as a teacher.');
+    }
+
+    public function rejectTeacher($id)
+    {
+        $request = TeacherRequest::findOrFail($id);
+        $request->update(['status' => 'rejected']);
+
+        return redirect()->back()->with('error', 'User request rejected.');
     }
 }

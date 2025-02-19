@@ -66,6 +66,10 @@ class User extends Authenticatable /*implements MustVerifyEmail*/
         return $this->hasMany(Enrollment::class);
     }
 
+    public function teacherRequest()
+    {
+        return $this->hasOne(TeacherRequest::class);
+    }
 
     // on creation of user, it get the student role by default
     protected static function boot()

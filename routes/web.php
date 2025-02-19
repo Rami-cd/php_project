@@ -6,8 +6,9 @@ use App\Http\Controllers\CourseModuleController;
 use App\Http\Controllers\EnrollmentController;
 use App\Models\Categories;
 use App\Models\course;
+use App\Models\TeacherRequest;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\TeacherRequestController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Gate;
@@ -61,6 +62,9 @@ Route::get("/courses/{id}", [CourseController::class, 'get_course_by_id'])
 Route::post('/courses/create-course', [CourseController::class, 'create_course'])
     ->name('create_course')
     ->middleware(['auth', 'permission:create courses']);
+
+Route::get('/courses/create_course', [CourseController::class, 'course_form'])
+->name('course_creation_form');
 
 Route::put('/courses/{id}', [CourseController::class, 'edit_course'])
     ->name('edit_course')
@@ -135,6 +139,20 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function() {
     Route::delete('/courses/{id}/delete', [AdminController::class, 'deleteCourse'])->name('admin.courses.delete');
 });
 // Admin routes
+
+
+// User submits teacher request
+Route::middleware(['auth'])->group(function () {
+    Route::get('/become-teacher', [TeacherRequestController::class, 'showForm'])->name('become.teacher.form');
+    Route::post('/become-teacher', [TeacherRequestController::class, 'submitRequest'])->name('become.teacher');
+});
+
+// Admin reviews requests
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/teacher-requests', [AdminController::class, 'viewRequests'])->name('admin.teacher.requests');
+    Route::post('/admin/approve-teacher/{id}', [AdminController::class, 'approveTeacher'])->name('admin.approve.teacher');
+    Route::post('/admin/reject-teacher/{id}', [AdminController::class, 'rejectTeacher'])->name('admin.reject.teacher');
+});
 
 
 require __DIR__.'/auth.php';

@@ -117,4 +117,9 @@ class CourseController extends Controller
         $course = Course::findOrFail(intval($id));
         
     }
+
+
+    public function course_form() {
+        return view('courses.createcourse');
+    }
 }
