@@ -6,15 +6,10 @@
     <title>Course Info</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
-    <script>
-        function showDetail(index) {
-            console.log(index);
-        }
-    </script>
 </head>
 <body class="bg-gray-100">
     <div class="flex justify-center items-center min-h-screen px-4">
-        <div class="bg-white w-full max-w-4xl p-6 rounded-lg shadow-xl">
+        <div class="bg-white w-full max-w-7xl p-6 rounded-lg shadow-xl">
             <h1 class="text-3xl font-semibold text-center text-gray-800 mb-6">Course Info</h1>
 
             <!-- Course Information Section -->
@@ -42,24 +37,36 @@
                 @endcan
             @endauth
 
-            <!-- Module List with Alpine.js for interactivity -->
-            <div x-data="{ currentModule: null }" class="overflow-y-scroll max-h-64 mt-8">
-                @foreach ($modules as $module)
-                    <!-- Module List Item -->
-                    <div @click="currentModule = currentModule === {{ $module->id }} ? null : {{ $module->id }}" class="cursor-pointer hover:bg-blue-100 p-4">
-                        <h3 class="text-xl font-semibold text-gray-800">{{ $module->name }}</h3>
-                        <p class="text-gray-500 mt-2">{{ $module->description }}</p>
+            <!-- Module List and Video Section -->
+            <div x-data="{ currentModule: null }" class="flex mt-8">
+                <!-- Module List (Left side) -->
+                <div class="w-1/4 bg-gray-100 p-4 rounded-lg mr-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Modules</h2>
+                    <div class="space-y-4">
+                        @foreach ($modules as $module)
+                            <div @click="currentModule = currentModule === {{ $module->id }} ? null : {{ $module->id }}" 
+                                class="cursor-pointer hover:bg-blue-100 p-2 rounded">
+                                <h3 class="text-lg font-medium text-gray-800">{{ $module->name }}</h3>
+                            </div>
+                        @endforeach
                     </div>
+                </div>
 
-                    <!-- Video Component -->
-                    <div x-show="currentModule === {{ $module->id }}" x-transition>
-                        <h3 class="text-2xl font-semibold text-gray-800">{{ $module->name }} Video</h3>
-                        <video class="w-full rounded-lg mt-4" controls>
-                            <source src="{{ Storage::url($module->course_url) }}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                @endforeach
+                @can('enrolled-in-course', $course)
+                <!-- Video Section (Right side) -->
+                <div class="w-3/4">
+                    @foreach ($modules as $module)
+                        <!-- Video Component -->
+                        <div x-show="currentModule === {{ $module->id }}" x-transition>
+                            <h3 class="text-2xl font-semibold text-gray-800 mb-4">{{ $module->name }} Video</h3>
+                            <video class="w-full rounded-lg" controls>
+                                <source src="{{ Storage::url($module->course_url) }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    @endforeach
+                </div>
+                @endcan
             </div>
         </div>
     </div>

@@ -81,27 +81,23 @@ class CourseController extends Controller
         try {
             // Find the course by ID, or fail if not found
             $course = Course::findOrFail(intval($id));
-
+    
             // Check if the user has permission to delete the course
             if (Gate::allows('manage courses', [$course])) { 
                 // Proceed to delete the course
                 $course->delete();
                 
-                // Return success message after deletion
-                return redirect()->route('get_all_courses');
+                // Return success message after deletion and redirect back to the same page
+                return redirect()->back()->with('success', 'Course deleted successfully!');
             } else {
                 // Throw an AuthorizationException if the user isn't authorized
                 throw new AuthorizationException('You are not authorized to delete this course.');
             }
         } catch (\Exception $e) {
             // Catch any exceptions and return a detailed error response
-            return response()->json([
-                'message' => 'An error occurred while deleting the course.',
-                'error' => $e->getMessage()
-            ], 500);
+            return redirect()->back()->with('error', 'An error occurred while deleting the course: ' . $e->getMessage());
         }
-    }
-    
+    }    
 
     public function show_course_info($id) {
         $course = Course::findOrFail(intval($id));
@@ -121,5 +117,15 @@ class CourseController extends Controller
 
     public function course_form() {
         return view('courses.createcourse');
+    }
+
+    public function teacherDashboard()
+    {
+        $teacher = auth()->user();
+        
+        // Fetch courses where the authenticated teacher is the owner
+        $courses = Course::where('teacher_id', $teacher->id)->with('modules')->get();
+
+        return view('teacher.dashboard', compact('courses'));
     }
 }

@@ -44,8 +44,14 @@
                 Create Module
             </button>
         </form>
+
+        <!-- Back Button to Main Page -->
+        <a href="{{ route('dashboard') }}" class="mt-6 block text-center text-blue-600 hover:text-blue-800">
+            <button class="w-full bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 focus:outline-none">
+                Back to Dashboard
+            </button>
+        </a>
     </div>
 
-    
 </body>
 </html>
