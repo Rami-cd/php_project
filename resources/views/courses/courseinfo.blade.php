@@ -18,6 +18,47 @@
                 <p class="text-gray-600 mt-2 text-lg">{{ $course->description }}</p>
             </div>
 
+            <!-- Course Creators Section -->
+            @if($course->users && $course->users->isNotEmpty())
+                <div class="bg-white p-6 rounded-lg shadow-md mt-6 border border-gray-200">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Course Creators</h3>
+                    
+                    <!-- Scrollable Creators List -->
+                    <div class="space-y-4 max-h-80 overflow-y-auto">
+                        @foreach ($course->users as $creator)
+                            <div class="flex items-center space-x-4">
+                                <img src="{{ $creator->profile_image ? Storage::url($creator->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($creator->name) . '&background=random&color=fff' }}"
+                                    alt="Creator Profile"
+                                    class="w-16 h-16 rounded-full object-cover border border-gray-300">
+
+                                <div>
+                                    <h4 class="text-xl font-bold text-gray-800">{{ $creator->name }}</h4>
+                                    <p class="text-gray-600 text-sm">{{ $creator->email }}</p>
+                                    <p class="text-gray-500 text-sm mt-1">Joined: {{ $creator->created_at->format('F Y') }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @else
+                <p class="text-center text-gray-500">No creators available for this course.</p>
+            @endif
+
+            @can('enrolled-in-course', $course)
+            <form action="{{ route('course.rate', $course->id) }}" method="POST">
+                @csrf
+                <label for="rating">Rate this Course:</label>
+                <select name="rating" id="rating" required>
+                    <option value="1">1 Star</option>
+                    <option value="2">2 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="5">5 Stars</option>
+                </select>
+                <button type="submit" class="bg-blue-500 text-white p-2 mt-2">Submit Rating</button>
+            </form>
+            @endcan
+
             <!-- Enroll / Unenroll Button -->
             @auth
                 @can('enrolled-in-course', $course)

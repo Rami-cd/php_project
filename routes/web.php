@@ -7,6 +7,7 @@ use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\UserController;
 use App\Models\Categories;
 use App\Models\course;
+use App\Models\User;
 use App\Models\TeacherRequest;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TeacherRequestController;
@@ -23,6 +24,9 @@ Route::get('/courses/create-course-form', [CourseController::class, 'course_form
 Route::get('/courses/search', [CourseController::class, 'search'])
     ->name('courses.search');
 
+Route::get('/teachers', [UserController::class, 'getTeachers'])
+    ->name('get.teachers');
+
 Route::get('/', function () {
     // $courses = Course::all();  // Retrieve all courses
     // return view('Courses.index', compact('courses'));
@@ -30,6 +34,10 @@ Route::get('/', function () {
     // return view('courses.createcourse');
 
     $warningMessage = null;
+
+    $teachers = User::role('teacher')
+        ->orderByDesc('points')
+        ->paginate(10);
 
     $courses = Course::has('modules')->paginate(8);
     $categories = Categories::all();
@@ -44,7 +52,7 @@ Route::get('/', function () {
     }
 }
 
-    return view('home', compact('categories', 'courses', 'warningMessage'));
+    return view('home', compact('categories', 'courses', 'warningMessage', 'teachers'));
 })->name("home");
 
 Route::get('/dashboard', function () {
@@ -141,6 +149,8 @@ Route::middleware(['auth'])->get('/teacher-dashboard', [UserController::class, '
 // Home Controller
 Route::get('/search', [HomeController::class, 'search'])
     ->name('home.search');
+Route::get('/teachers/search', [HomeController::class, 'searchTeacher'])
+    ->name('teachers.search');
 // Home Controller
 
 
@@ -189,5 +199,10 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/teacher/dashboard', [CourseController::class, 'teacherDashboard'])
         ->name('teacher.dashboard');
 });
+
+// course rating
+Route::post('/course/{courseId}/rate', [CourseController::class, 'rate'])
+    ->name('course.rate')
+    ->middleware(['auth', 'permission:enroll courses']);
 
 require __DIR__.'/auth.php';

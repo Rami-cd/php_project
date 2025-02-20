@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Categories;
+use App\Models\Rating;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -13,12 +14,35 @@ class CourseController extends Controller
 {
     public function get_all_courses() {
         try {
-            $courses = Course::query()->orderBy("created_at","desc")->paginate(10);
-            return view('courses.main', ["courses"=> $courses]);
+            dd("here");
+            // Retrieve courses, eager load their ratings, and include rating count and average
+            $courses = Course::withCount('ratings')  // Count the number of ratings for each course
+                ->with('ratings')  // Eager load ratings
+                ->get()
+                ->map(function ($course) {
+                    // Debugging: Check if ratings are being loaded correctly
+                    dd($course->ratings);  // Inspect the loaded ratings for this course
+                    
+                    // Calculate the average rating for each course (if any ratings exist)
+                    if ($course->ratings->isNotEmpty()) {
+                        $course->average_rating = $course->ratings->avg('rating');
+                    } else {
+                        $course->average_rating = 0;  // Default value if no ratings
+                    }
+    
+                    // Debugging: Check if average rating is being calculated
+                    dd($course->average_rating);  // Inspect the calculated average
+                    
+                    return $course;
+                });
+    
+            // Returning courses to view (after ensuring ratings and average are calculated)
+            return view('courses.main', compact('courses'));
         } catch (\Exception $e) {
             return response()->json(["error", $e->getMessage()], 400);
         }
-    }
+    }    
+    
 
     public function get_course_by_id($id)
     {
@@ -44,6 +68,7 @@ class CourseController extends Controller
                 "name"=> $request->name,
                 "description"=> $request->description,
                 "thumbnail_url"=> $filePath,
+                "average_rating"=> 0,
             ]);
 
             $course->users()->attach(Auth::id());
@@ -134,21 +159,69 @@ class CourseController extends Controller
     public function search(Request $request)
     {
         $searchTerm = $request->input('search_term');
-        // $categoryId = $request->input('category_id'); // Commenting out the category filter
+        // $categoryId = $request->input('category_id'); // Commented out category filter
 
         // Query the courses based on the search term
         $courses = Course::when($searchTerm, function ($query) use ($searchTerm) {
                 return $query->where('name', 'like', '%' . $searchTerm . '%');
             })
-            // Commenting out the category filter block
+            // Optional category filter logic, you can re-enable it if needed
             // ->when($categoryId, function ($query) use ($categoryId) {
             //     return $query->where('category_id', $categoryId);
             // })
-            ->paginate(10);  // Change to paginate (10 items per page)
+            ->with('ratings') // Eager load the ratings relationship
+            ->paginate(10);  // Paginate 10 items per page
 
-        $categories = Categories::all();
+        // Calculate the average rating for each course
+        foreach ($courses as $course) {
+            $course->average_rating = $course->ratings->avg('rating_value'); // Assuming 'rating_value' is the column for rating
+        }
 
-        // Return the view with the paginated courses
+        $categories = Categories::all(); // If needed, pass categories to the view
+
+        // Return the view with the paginated courses and categories
         return view('home', compact('courses', 'categories'));
     }
+
+    public function rate(Request $request, $courseId)
+{
+    // Validate that the rating is an integer between 1 and 5
+    $request->validate([
+        'rating' => 'required|integer|between:1,5',
+    ]);
+
+    $course = Course::findOrFail($courseId);
+
+    // Ensure the user is enrolled in the course
+    $user = Auth::user();
+    if (!Gate::check('enrolled-in-course', $course)) {
+        return back()->withErrors(['error' => 'You must be enrolled in the course to rate it.']);
+    }
+
+    // Check if the user has already rated the course
+    $existingRating = Rating::where('user_id', $user->id)
+                            ->where('course_id', $course->id)
+                            ->first();
+
+    // Update or create the rating
+    if ($existingRating) {
+        // If the user has already rated, update their rating
+        $existingRating->update(['rating_value' => $request->rating]);
+    } else {
+        // If the user hasn't rated, create a new rating
+        Rating::create([
+            'user_id' => $user->id,
+            'course_id' => $course->id,
+            'rating_value' => $request->rating,
+        ]);
+    }
+
+    // Recalculate the average rating for the course
+    $averageRating = $course->ratings()->avg('rating_value');
+    $course->average_rating = $averageRating;
+    $course->save();  // Save the updated average rating back to the course
+
+    return back()->with('success', 'Your rating has been submitted.');
+}
+
 }

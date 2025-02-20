@@ -23,5 +23,10 @@ class UserController extends Controller
         return view('teacher.dashboard', compact('courses'));
     }
     
-
+    // public function getTeachers(Request $request) {
+    //     $teachers = User::role('teacher')
+    //             ->orderByDesc('points')
+    //             ->paginate(10);
+    //     return view('partials.teacher_list', compact('$teachers'));
+    // }
 }
