@@ -12,13 +12,43 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <h3>Your Courses</h3>
+
+                    <form method="GET" action="{{ route('teacher.dashboard') }}" class="flex flex-col md:flex-row gap-2 md:gap-4 items-center bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+    <!-- Search Input -->
+    <div class="w-full md:w-auto flex-1">
+        <input type="text" name="search" placeholder="Search courses..." class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ request('search') }}">
+    </div>
+
+    <!-- Status Dropdown -->
+    <div class="w-full md:w-auto">
+        <select name="status" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">All Statuses</option>
+            <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Published</option>
+            <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+        </select>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-300">
+        🔍 Search
+    </button>
+</form>
+
+
+
                     <ul>
-                        @foreach (Auth::user()->courses as $course)
+                        <!-- Display Paginated Courses -->
+                        @foreach ($courses as $course)
                             <li class="mb-4">
                                 <x-course-card :course="$course" />
                             </li>
                         @endforeach
                     </ul>
+
+                    <!-- Pagination Links -->
+                    <div class="mt-4">
+                        {{ $courses->links() }}
+                    </div>
 
                     <!-- Button to Create a New Course -->
                     <a href="{{ route('course_creation_form') }}" class="bg-blue-500 text-white p-2 rounded-md mt-4 inline-block">
@@ -34,12 +64,15 @@
                     <ul>
                         @foreach (Auth::user()->courses as $course)
                             <li>
-                                <h4 class="text-lg font-semibold">{{ $course->name }}</h4>
-                                <ul>
-                                    @foreach ($course->user_enrolled_courses as $student)
-                                        <li>{{ $student->name }}</li>
-                                    @endforeach
-                                </ul>
+                                @if($course->user_enrolled_courses)
+                                    <h4 class="text-lg font-semibold">Course: {{ $course->name }}</h4>
+                                    <h2>Students: </h2>
+                                    <ul>
+                                        @foreach ($course->user_enrolled_courses as $student)
+                                            <li>{{ $student->name }}</li>
+                                        @endforeach
+                                    </ul>
+                                @endif
                             </li>
                         @endforeach
                     </ul>

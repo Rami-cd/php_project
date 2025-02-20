@@ -23,7 +23,7 @@ class RoleAndPermissionSeeder extends Seeder
  
         // Create roles if they don't exist
         $admin = Role::firstOrCreate(['name' => 'admin']);
-        $teacher = Role::firstOrCreate(['name' => 'teacher']);
+        $teacher = Role::firstOrCreate(['name' => 'teacher']); 
         $student = Role::firstOrCreate(['name' => 'student']); 
 
         // Assign permissions to roles

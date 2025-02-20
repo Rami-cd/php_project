@@ -53,7 +53,7 @@
 
     <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
         
-        <img src="https://dummyimage.com/400x300/ddd/fff.png&text=Loading..." alt="Custom Placeholder">
+        <img src="{{ asset('storage/' . $course->thumbnail_url) }}" alt="Custom Placeholder">
         
         <div class="p-5">
             @can('edit-course', $course)

@@ -1,7 +1,7 @@
 <div class="max-w-sm mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
   <!-- Card Header -->
   <div class="relative">
-    <img class="w-full h-48 object-cover" src="{{ asset($course->thumbnail_url) }}" alt="Course Thumbnail">
+    <img class="w-full h-48 object-cover" src="{{ asset('storage/' . $course->thumbnail_url) }}" alt="Custom Placeholder">
     <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black via-transparent to-transparent">
       <h2 class="text-2xl font-semibold text-white">{{ $course->name }}</h2>
     </div>
