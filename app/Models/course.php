@@ -12,7 +12,7 @@ class Course extends Model
 {
     use HasFactory;
     protected $table = "courses"; 
-    protected $fillable = ["name", "description", "thumbnail_url"];
+    protected $fillable = ["name", "description", "thumbnail_url", "average_rating"];
 
     // connect to the many to many table creator
     public function users()
@@ -35,5 +35,10 @@ class Course extends Model
     public function category()
     {
         return $this->belongsTo(Categories::class);
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
     }
 }

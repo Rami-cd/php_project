@@ -7,81 +7,159 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-<body>
+<body class="bg-gray-50">
+
 <header class="bg-white shadow-md py-4">
     <div class="max-w-screen-xl mx-auto flex justify-between items-center px-4">
-        <!-- Logo (Optional) -->
+        <!-- Logo -->
         <div class="text-lg font-bold text-gray-800">
             <img src="{{ asset('storage/uploads/logo-transparent.png') }}" alt="logo" class="w-20 h-auto">
         </div>
 
-        <!-- Search Form -->
-        <form id="search-form" method="GET" action="{{ route('courses.search') }}" class="max-w-lg mx-auto">
-            <div class="w-full max-w-sm min-w-[200px]">
-                <div class="relative mt-2">
-                    <div class="absolute top-1 left-1 flex items-center">
-                        <button type="button" id="dropdownButton" class="rounded border border-transparent py-1 px-1.5 text-center flex items-center text-sm transition-all text-slate-600">
-                            <span id="dropdownSpan" class="text-ellipsis overflow-hidden">Category</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 ml-1">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                            </svg>
-                        </button>
-                        <div class="h-6 border-l border-slate-200 ml-1"></div>
-                        <div id="dropdownMenu" class="min-w-[150px] overflow-hidden absolute left-0 w-full mt-10 hidden w-full bg-white border border-slate-200 rounded-md shadow-lg z-10">
-                            <ul id="dropdownOptions">
-                                @foreach ($categories as $category)
-                                    <li class="px-4 py-2 text-slate-600 hover:bg-slate-50 text-sm cursor-pointer" data-value="{{ $category->name }}" data-id="{{ $category->id }}">
-                                        {{ $category->name }}
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
-                    <!-- Search Input -->
-                    <input
-                        type="text"
-                        name="search_term"
-                        class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-28 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                        placeholder="Search courses..."
-                        value="{{ request('search_term') }}" />
-                    <input type="hidden" name="category_id" id="category_id" value="{{ request('category_id') }}">
-                    <button type="submit"
-                        class="absolute top-1 right-1 flex items-center rounded bg-sky-500 py-1 px-2.5 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow focus:bg-sky-400 focus:shadow-none active:bg-sky-400 hover:bg-sky-400 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-4 h-4 mr-1.5">
-                            <path fill-rule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clip-rule="evenodd" />
-                        </svg>
-                        Search
-                    </button>
-                </div>
-            </div>
-        </form>
+        <form method="GET" action="{{ route('courses.search') }}" class="w-3xl max-w-2xl mx-auto">
+    <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+    <div class="relative">
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+            </svg>
+        </div>
+        <input type="search" id="default-search" name="search_term" class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search courses..." value="{{ request('search_term') }}" required />
+        <button type="submit" class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
+    </div>
+</form>
+
 
         <!-- Action Buttons -->
         <div class="flex space-x-4 items-center">
             @guest
-                <a href="{{ route('register') }}"><button class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-br from-cyan-500 to-blue-500 rounded-md hover:bg-transparent hover:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200">Sign Up</button></a>
-                <a href="{{ route('login') }}"><button class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-br from-cyan-500 to-blue-500 rounded-md hover:bg-transparent hover:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200">Login</button></a>
+                <a href="{{ route('register') }}">
+                    <button class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-br from-cyan-500 to-blue-500 rounded-md shadow-md hover:bg-transparent hover:text-white">
+                        Sign Up
+                    </button>
+                </a>
+                <a href="{{ route('login') }}">
+                    <button class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-br from-cyan-500 to-blue-500 rounded-md shadow-md hover:bg-transparent hover:text-white">
+                        Login
+                    </button>
+                </a>
             @else
-                <a href="{{ route('dashboard') }}"><button class="bg-transparent hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded">Dashboard</button></a>
+            @cannot('is-teacher')
+                <a href="{{ route('become.teacher.form') }}">
+                <button class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                    Teach on The Platform
+                </button>
+</a>
+            @endcan
+            @can('is-teacher')
+            <a href="{{ route('course_creation_form') }}">
+
+
+            
+                <button class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                    Create Course
+                </button>
+                </a>
+            @endcan
+                <a href="{{ route('dashboard') }}">
+                    <button class="bg-transparent border border-green-500 text-green-700 font-semibold py-2 px-4 rounded-md hover:bg-green-500 hover:text-white shadow-md">
+                        Dashboard
+                    </button>
+                </a>
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-br from-cyan-500 to-blue-500 rounded-md hover:bg-transparent hover:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200">Logout</button>
+                    <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-br from-cyan-500 to-blue-500 rounded-md shadow-md hover:bg-transparent hover:text-white">
+                        Logout
+                    </button>
                 </form>
             @endguest
 
-            <!-- Profile Image -->
             @auth
                 <a href="{{ route('profile.show') }}">
-                    <img src="{{ Auth::user()->image_url ? Storage::url(Auth::user()->image_url) : asset('images/default-avatar.png') }}" alt="Profile" class="w-10 h-10 rounded-full border-2 border-gray-300 cursor-pointer ml-4" />
+                    <img src="{{ Auth::user()->image_url }}"
+                        onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->username) }}&background=random&color=fff';"
+                        alt="Profile Image"
+                        class="w-10 h-10 rounded-full object-cover border border-gray-300">
                 </a>
             @endauth
         </div>
     </div>
 </header>
 
-<div id="courses-section">
-    @include('courses.main', ['courses' => $courses])
-</div>
+<!-- Courses Section -->
+<section id="courses-section" class="max-w-screen-xl mx-auto my-10 px-4">
+    <h1 class="text-4xl font-extrabold text-gray-900 text-center mb-6">📚 Explore Our Courses</h1>
+    <p class="text-lg text-gray-600 text-center mb-8">
+        Find the best courses to enhance your skills and knowledge.
+    </p>
+    <div class="bg-white shadow-md rounded-lg p-6">
+        @include('courses.main', ['courses' => $courses])
+    </div>
+</section>
+
+<section id="teacher-section" class="max-w-screen-xl mx-auto my-10 px-4">
+    <h1 class="text-4xl font-extrabold text-gray-900 text-center mb-6">🎓 Meet Our Top Teachers</h1>
+    <p class="text-lg text-gray-600 text-center mb-8">
+        Learn from the best educators with top ratings and experience.
+    </p>
+
+    <!-- Teacher Search Form -->
+    <form id="teacher-search-form" class="max-w-lg mx-auto mb-6">
+        <div class="relative">
+            <input type="text" id="teacher-search-input" name="search_term"
+                class="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-gray-700 text-sm shadow-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                placeholder="Search teachers by name or email..." />
+            <button type="submit"
+                class="absolute top-1 right-1 bg-blue-500 text-white py-1.5 px-3 rounded-md text-sm shadow-md hover:bg-blue-600 transition">
+                Search
+            </button>
+        </div>
+    </form>
+
+    <div class="bg-white shadow-md rounded-lg p-6" id="teacher-list">
+        @include('partials.teacher_list', ['teachers' => $teachers])
+    </div>
+</section>
+
+
 
 </body>
+
+<script>
+$(document).ready(function() {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    });
+
+    $("#teacher-search-form").on("submit", function(event) {
+        event.preventDefault(); // Prevent page reload
+
+        let searchTerm = $("#teacher-search-input").val();
+
+        console.log(searchTerm);
+
+        $.ajax({
+            url: "{{ route('teachers.search') }}",
+            type: "GET",
+            data: { search_term: searchTerm },
+            success: function(response) {
+                console.log(response);
+                if (response.teachers) {
+                    $("#teacher-list").html(response.teachers); // Ensure correct content update
+                } else {
+                    $("#teacher-list").html('<p class="text-gray-600">No teachers found.</p>');
+                }
+            },
+            error: function(xhr) {
+                console.log(xhr.responseText);
+                alert("An error occurred. Please try again.");
+            }
+        });
+    });
+});
+</script>
+
+
 </html>
