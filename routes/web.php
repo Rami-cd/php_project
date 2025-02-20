@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseModuleController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\UserController;
 use App\Models\Categories;
 use App\Models\course;
 use App\Models\TeacherRequest;
@@ -18,6 +19,9 @@ use Illuminate\Auth\Access\AuthorizationException;
 Route::get('/courses/create-course-form', [CourseController::class, 'course_form'])
 ->name('course_creation_form')
 ->middleware(['auth', 'permission:create courses']);
+
+Route::get('/courses/search', [CourseController::class, 'search'])
+    ->name('courses.search');
 
 Route::get('/', function () {
     // $courses = Course::all();  // Retrieve all courses
@@ -44,7 +48,7 @@ Route::get('/', function () {
 })->name("home");
 
 Route::get('/dashboard', function () {
-    $courses = Course::paginate(10);
+    $courses = Course::paginate(2);
 
     // Check roles and return the appropriate view
     if (auth()->user() && auth()->user()->hasRole('admin')) {
@@ -91,8 +95,6 @@ Route::post('/courses/create-course', [CourseController::class, 'create_course']
     ->name('create_course')
     ->middleware(['auth', 'permission:create courses']);
 
-
-
 Route::put('/courses/{id}', [CourseController::class, 'edit_course'])
     ->name('edit_course')
     ->middleware(['auth', 'permission:manage courses']);
@@ -110,8 +112,7 @@ Route::post('/courses/create_module', [CourseModuleController::class, 'create_mo
 Route::get('/courses/module_form/{course}', [CourseModuleController::class, 'module_form'])
     ->name('module_creation_form');
 
-Route::get('/courses/search', [CourseController::class, 'search'])
-    ->name('courses.search');
+
 
     // Route::get('/courses/{courseId}', [CourseController::class, 'show'])->name('courses.show');
     // Route::get('/courses/{courseId}/module/{moduleId}', [CourseController::class, 'module'])->name('courses.module');
@@ -126,11 +127,14 @@ Route::put('/module/{module}', [CourseModuleController::class, 'update'])->name(
 
 // User routes
 Route::post('/enroll/{course}', [EnrollmentController::class, 'enroll'])
-    ->middleware(['auth', 'permission:manage courses'])
+    ->middleware(['auth', 'permission:enroll courses'])
     ->name('courses.enroll');
 Route::post('/unenroll/{courseId}', [EnrollmentController::class, 'unenroll'])
-    ->middleware(['auth', 'permission:manage courses'])
+    ->middleware(['auth', 'permission:enroll courses'])
     ->name('courses.unenroll');
+Route::middleware(['auth'])->get('/teacher-dashboard', [UserController::class, 'teacherDashboard'])
+->name('teacher.dashboard');
+
 // User routes
 
 

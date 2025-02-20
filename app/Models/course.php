@@ -11,7 +11,7 @@ use App\Models\Categories;
 class Course extends Model
 {
     use HasFactory;
-    protected $table = "courses";
+    protected $table = "courses"; 
     protected $fillable = ["name", "description", "thumbnail_url"];
 
     // connect to the many to many table creator

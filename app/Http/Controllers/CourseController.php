@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Categories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -26,7 +27,7 @@ class CourseController extends Controller
         
         if (!$course) {
             abort(404); // If course not found, handle error
-        }
+        } 
 
         // Redirect to the show_course_info route with the same ID
         return redirect()->route('show_course_info', ['id' => $id]);
@@ -104,9 +105,10 @@ class CourseController extends Controller
         $modules = $course->modules;
         // dd($modules);
 
-        if (Auth::user()->courses->contains($course)) {
-            return view('courses.courseinfo', compact('course', 'modules'));
-        }
+        // if (Auth::user()->courses->contains($course)) {
+        //     return view('courses.courseinfo', compact('course', 'modules'));
+        // }
+        return view('courses.courseinfo', compact('course', 'modules'));
     }
 
     public function add_modules($id) {
@@ -127,5 +129,26 @@ class CourseController extends Controller
         $courses = Course::where('teacher_id', $teacher->id)->with('modules')->get();
 
         return view('teacher.dashboard', compact('courses'));
+    }
+
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search_term');
+        // $categoryId = $request->input('category_id'); // Commenting out the category filter
+
+        // Query the courses based on the search term
+        $courses = Course::when($searchTerm, function ($query) use ($searchTerm) {
+                return $query->where('name', 'like', '%' . $searchTerm . '%');
+            })
+            // Commenting out the category filter block
+            // ->when($categoryId, function ($query) use ($categoryId) {
+            //     return $query->where('category_id', $categoryId);
+            // })
+            ->paginate(10);  // Change to paginate (10 items per page)
+
+        $categories = Categories::all();
+
+        // Return the view with the paginated courses
+        return view('home', compact('courses', 'categories'));
     }
 }
