@@ -13,7 +13,8 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <!-- Updated form for profile update -->
+    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
         @csrf
         @method('patch')
 
@@ -45,6 +46,21 @@
                     @endif
                 </div>
             @endif
+        </div>
+
+        <!-- Profile Image Input -->
+        <div>
+            <x-input-label for="image_url" :value="__('Profile Image')" />
+            <div class="flex items-center">
+                <div class="w-24 h-24 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-300">
+                    <!-- Display the profile image or the placeholder image -->
+                    <img id="profile-image" class="w-full h-full object-cover"
+                         src="{{ $user->image_url ? Storage::url(Auth::user()->image_url) : asset('images/default-avatar.jpg') }}"
+                         alt="Profile Image">
+                </div>
+                <input id="image_url" name="image_url" type="file" class="ml-4">
+            </div>
+            <x-input-error class="mt-2" :messages="$errors->get('image_url')" />
         </div>
 
         <div class="flex items-center gap-4">
